@@ -1,5 +1,5 @@
 <?php
-
+require_once('db.php');
 define('BASE_PATH', '/gebd/index.php/' );
 
 $requestUri = $_SERVER['REQUEST_URI'];
@@ -19,9 +19,63 @@ if (empty($requestUriArray)) {
     die;
 }
 
-echo 'Hello';
+$model = $requestUriArray[0];
 
+if (count($requestUriArray) === 1) {
+    // Vue "liste"
+    echo 'Model: ' . $model;
+    die;
+}
 
+if (count($requestUriArray) === 2) {
+    $isAdd = $requestUriArray[1] === 'add';
+    if ($isAdd && $requestMethod === 'GET') {
+        // Vue "ajout"
+        echo 'Add';
+        die;
+    }
+
+    if ($isAdd && $requestMethod === 'POST') {
+        // Enregistrer le nouveau modèle
+        echo 'Save';
+        die;
+    }
+
+    if (ctype_digit($requestUriArray[1])) {
+        // Vue "détail"
+        echo 'Detail';
+        die;
+    }
+
+    echo 'Invalid id or action';
+    die;
+}
+
+if (count($requestUriArray) === 3) {
+    // Vérifier que l'id est numérique
+    $isValidId = ctype_digit($requestUriArray[1]); // Vérifier que le 2e element est numérique
+
+    if (!$isValidId) {
+        echo 'Invalid ID';
+        die;
+    }
+
+    // Vérifier que le 3e element est "edit"
+    if ($requestUriArray[2] !== 'edit') {
+        echo 'Invalid action';
+        die;
+    }
+
+    echo 'Edit';
+
+    if ($requestMethod === 'GET') {
+        // Afficher le formulaire
+    }
+
+    if ($requestMethod === 'POST') {
+        // Enregistrer les modifications
+    }
+}
 
 // '' => 0
 // videogames => 1
