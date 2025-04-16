@@ -68,6 +68,9 @@ if (count($requestUriArray) === 1) {
         foreach ($row as $col => $value) {
             $str .= '<td>' . $value . '</td>';
         }
+        $str .= '<td>';
+        $str .= '<a href="'. BASE_PATH . $model . '/' . $row['id'] .'">View</a>';
+        $str .= '</td>';
         $str .= '</tr>';
     }
 
