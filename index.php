@@ -2,6 +2,10 @@
 require_once('db.php');
 define('BASE_PATH', '/gebd/index.php/' );
 
+$modelsArray = [
+    'videogames' => 'jeux_video',
+];
+
 $requestUri = $_SERVER['REQUEST_URI'];
 $requestMethod = $_SERVER['REQUEST_METHOD'];
 
@@ -24,6 +28,15 @@ $model = $requestUriArray[0];
 if (count($requestUriArray) === 1) {
     // Vue "liste"
     echo 'Model: ' . $model;
+    $tableName  = $modelsArray[$model] ?? false;
+    if (!$tableName) {
+        echo 'Invalid model';
+        die;
+    }
+    $results = fetchAll($db, $tableName);
+    echo '<pre>';
+    var_dump($results);
+    echo '</pre>';
     die;
 }
 
@@ -78,7 +91,7 @@ if (count($requestUriArray) === 3) {
 }
 
 // '' => 0
-// videogames => 1
-// videogames/1 => 2
-// videogames/add => 2
-// videogames/1/edit => 3
+// videogames => 1 => afficher toutes les données de ce type de ressource
+// videogames/1 => 2 => afficher les données de la ressource avec l'id numérique
+// videogames/add => 2 => afficher le formulaire d'ajout
+// videogames/1/edit => 3 => afficher le formulaire d'édition
