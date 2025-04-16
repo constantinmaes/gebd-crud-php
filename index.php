@@ -71,7 +71,7 @@ if (count($requestUriArray) === 1) {
         $str .= '</tr>';
     }
 
-    $table .= '</tbody>';
+    $str .= '</tbody>';
     $str .= '</table>';
 
     echo $str;
