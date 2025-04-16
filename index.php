@@ -98,6 +98,7 @@ if (count($requestUriArray) === 2) {
     if (ctype_digit($requestUriArray[1])) {
         // Vue "détail"
         echo 'Detail<br>';
+        echo '<a href='. BASE_PATH . $model . '>Back to '. $model .'</a><br>';
         $tableName  = $modelsArray[$model] ?? false;
         if (!$tableName) {
             echo 'Invalid model';
