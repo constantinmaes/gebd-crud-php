@@ -97,7 +97,17 @@ if (count($requestUriArray) === 2) {
 
     if (ctype_digit($requestUriArray[1])) {
         // Vue "détail"
-        echo 'Detail';
+        echo 'Detail<br>';
+        $tableName  = $modelsArray[$model] ?? false;
+        if (!$tableName) {
+            echo 'Invalid model';
+            die;
+        }
+        $id = $requestUriArray[1];
+        $result = fetchById($db, $tableName, $id);
+        foreach ($result as $col => $value) {
+            echo $col . ': ' . $value . '<br>';
+        }
         die;
     }
 
