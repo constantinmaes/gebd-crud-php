@@ -86,12 +86,42 @@ if (count($requestUriArray) === 2) {
     if ($isAdd && $requestMethod === 'GET') {
         // Vue "ajout"
         echo 'Add';
+
+        $tableName  = $modelsArray[$model] ?? false;
+        if (!$tableName) {
+            echo 'Invalid model';
+            die;
+        }
+        $results = fetchAll($db, $tableName);
+        $firstRow = $results[0];
+        $columns = array_keys($firstRow);
+        $columns = array_filter($columns, function($col) {
+            return $col !== 'id';
+        });
+        $str = '<form method="POST" action="">';
+        // Boucle pour les colonnes
+        foreach ($columns as $col) {
+            // if ($col === 'id') {
+            //     continue;
+            // }
+            $str .= '<input type="text" name="' . $col . '" placeholder="' . $col . '" /><br>';
+        }
+
+        $str .= '<input type="submit" value="Save" />';
+
+        $str .= '</form>';
+        echo $str;
         die;
     }
 
     if ($isAdd && $requestMethod === 'POST') {
         // Enregistrer le nouveau modèle
-        echo 'Save';
+        $tableName  = $modelsArray[$model] ?? false;
+        if (!$tableName) {
+            echo 'Invalid model';
+            die;
+        }
+        save($db, $tableName, $_POST);
         die;
     }
 

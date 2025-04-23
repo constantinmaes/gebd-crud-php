@@ -20,4 +20,23 @@ function fetchById($connection, $table, $id) {
     return $query->fetch(PDO::FETCH_ASSOC);
 }
 
+function save($connection, $table, $data) {
+    // INSERT INTO $table (columns...) VALUES (values...);
+    // INSERT INTO jeux_video (nom, possesseur) VALUES (:nom, :possesseur)
+    $columns = array_keys($data);
+    $columnsStr = implode(', ', $columns); // split ; join
+    $placeholdersStr = ':' . implode(', :', $columns); // split ; join
+    $sql = 'INSERT INTO ' . $table . ' (' . $columnsStr . ') VALUES (' . $placeholdersStr . ');';
+    try {
+        $query = $connection->prepare($sql);
+        foreach ($data as $key => $value) {
+            $query->bindValue(':'.$key, $value);
+        }
+        $query->execute();
+    } catch (PDOException $e) {
+        echo 'Error: ' . $e->getMessage();
+        die;
+    }
+}
+
 
