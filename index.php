@@ -92,19 +92,46 @@ if (count($requestUriArray) === 2) {
             echo 'Invalid model';
             die;
         }
-        $results = fetchAll($db, $tableName);
+
+        $columns = getColumns($db, $tableName);
+        //var_dump($columns);
+
+        /*$results = fetchAll($db, $tableName);
         $firstRow = $results[0];
         $columns = array_keys($firstRow);
         $columns = array_filter($columns, function($col) {
             return $col !== 'id';
-        });
+        });*/
         $str = '<form method="POST" action="">';
         // Boucle pour les colonnes
         foreach ($columns as $col) {
             // if ($col === 'id') {
             //     continue;
             // }
-            $str .= '<input type="text" name="' . $col . '" placeholder="' . $col . '" /><br>';
+            $columnName = $col['COLUMN_NAME'];
+            $columnType = $col['DATA_TYPE'];
+            $isNullable = $col['IS_NULLABLE'];
+
+            if ($columnName === 'id') {
+                continue;
+            }
+
+            $inputStr = '<input name="' . $columnName . '" placeholder="' . $columnName . '" ';
+
+            if ($columnType === 'int' || $columnType === 'double') {
+                $inputStr .= 'type="number" ';
+            }
+
+            if ($columnType === 'date') {
+                $inputStr .= 'type="date" ';
+            }
+
+            $inputStr .= '/>';
+
+            $str .= $inputStr;
+            $str .= '<br>';
+
+            // $str .= '<input type="text" name="' . $col . '" placeholder="' . $col . '" /><br>';
         }
 
         $str .= '<input type="submit" value="Save" />';

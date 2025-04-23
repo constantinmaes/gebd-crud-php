@@ -20,6 +20,20 @@ function fetchById($connection, $table, $id) {
     return $query->fetch(PDO::FETCH_ASSOC);
 }
 
+function getColumns($connection, $table) {
+    $sql = "SELECT * FROM information_schema.COLUMNS WHERE TABLE_NAME = '".$table."'";
+    $query = $connection->prepare($sql);
+    $query->execute();
+    return $query->fetchAll(PDO::FETCH_ASSOC);
+}
+
+/*function getColumns($connection, $table) {
+    $sql = "SELECT * FROM information_schema.COLUMNS WHERE TABLE_NAME = ?";
+    $query = $connection->prepare($sql);
+    $query->execute([$table]);
+    return $query->fetchAll(PDO::FETCH_ASSOC);
+}*/
+
 function save($connection, $table, $data) {
     // INSERT INTO $table (columns...) VALUES (values...);
     // INSERT INTO jeux_video (nom, possesseur) VALUES (:nom, :possesseur)
@@ -31,6 +45,8 @@ function save($connection, $table, $data) {
         $query = $connection->prepare($sql);
         foreach ($data as $key => $value) {
             $query->bindValue(':'.$key, $value);
+            echo 'value => ' . $value . '<br>';
+            // $query->bindParam(':nom', valeur de nom dans $data);
         }
         $query->execute();
     } catch (PDOException $e) {
