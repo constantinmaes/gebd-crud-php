@@ -55,4 +55,36 @@ function save($connection, $table, $data) {
     }
 }
 
+function edit($connection, $table, $data, $id) {
+    // INSERT INTO $table (columns...) VALUES (values...);
+    // INSERT INTO jeux_video (nom, possesseur) VALUES (:nom, :possesseur)
+    $columns = array_keys($data);
+    $columnsStr = implode(', ', $columns); // split ; join
+    $placeholdersStr = ':' . implode(', :', $columns); // split ; join
+    $sql = 'UPDATE ' . $table . ' SET ';
+    foreach ($columns as $col) {
+        $sql .= $col . ' = :' . $col . ', ';
+        // name = :name, possesseur = :possesseur, 
+    }
+
+    $sql = rtrim($sql, ', '); // remove last comma
+    $sql .= ' WHERE id = :id';
+
+    // UPDATE jeux_video SET name = :name, possesseur = :possesseur WHERE id = :id
+
+    try {
+        $query = $connection->prepare($sql);
+        foreach ($data as $key => $value) {
+            $query->bindValue(':'.$key, $value !== '' ? $value : null);
+            echo 'value => ' . $value . '<br>';
+            // $query->bindParam(':nom', valeur de nom dans $data);
+        }
+        $query->bindValue(':id', $id);
+        $query->execute();
+    } catch (PDOException $e) {
+        echo 'Error: ' . $e->getMessage();
+        die;
+    }
+}
+
 

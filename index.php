@@ -71,6 +71,9 @@ if (count($requestUriArray) === 1) {
         $str .= '<td>';
         $str .= '<a href="'. BASE_PATH . $model . '/' . $row['id'] .'">View</a>';
         $str .= '</td>';
+        $str .= '<td>';
+        $str .= '<a href="'. BASE_PATH . $model . '/' . $row['id'] .'/edit">Edit</a>';
+        $str .= '</td>';
         $str .= '</tr>';
     }
 
@@ -156,6 +159,7 @@ if (count($requestUriArray) === 2) {
         // Vue "détail"
         echo 'Detail<br>';
         echo '<a href='. BASE_PATH . $model . '>Back to '. $model .'</a><br>';
+        echo '<a href='. BASE_PATH . $model . '/'.$requestUriArray[1].'/edit>Edit</a><br>';
         $tableName  = $modelsArray[$model] ?? false;
         if (!$tableName) {
             echo 'Invalid model';
@@ -175,6 +179,7 @@ if (count($requestUriArray) === 2) {
 
 if (count($requestUriArray) === 3) {
     // Vérifier que l'id est numérique
+    $id = $requestUriArray[1];
     $isValidId = ctype_digit($requestUriArray[1]); // Vérifier que le 2e element est numérique
 
     if (!$isValidId) {
@@ -192,10 +197,76 @@ if (count($requestUriArray) === 3) {
 
     if ($requestMethod === 'GET') {
         // Afficher le formulaire
+        $tableName  = $modelsArray[$model] ?? false;
+        if (!$tableName) {
+            echo 'Invalid model';
+            die;
+        }
+        $result = fetchById($db, $tableName, $id);
+
+        if (!$result) {
+            echo 'Invalid ID';
+            die;
+        }
+
+        $columns = getColumns($db, $tableName);
+        //var_dump($columns);
+
+        /*$results = fetchAll($db, $tableName);
+        $firstRow = $results[0];
+        $columns = array_keys($firstRow);
+        $columns = array_filter($columns, function($col) {
+            return $col !== 'id';
+        });*/
+        $str = '<form method="POST" action="">';
+        // Boucle pour les colonnes
+        foreach ($columns as $col) {
+            // if ($col === 'id') {
+            //     continue;
+            // }
+            $columnName = $col['COLUMN_NAME'];
+            $columnType = $col['DATA_TYPE'];
+            $isNullable = $col['IS_NULLABLE'];
+
+            if ($columnName === 'id') {
+                continue;
+            }
+
+            $inputStr = '<input name="' . $columnName . '" placeholder="' . $columnName . '" value="' . $result[$columnName] . '" ';
+
+            if ($columnType === 'int' || $columnType === 'double') {
+                $inputStr .= 'type="number" ';
+            }
+
+            if ($columnType === 'date') {
+                $inputStr .= 'type="date" ';
+            }
+
+            $inputStr .= '/>';
+
+            $str .= $inputStr;
+            $str .= '<br>';
+
+            // $str .= '<input type="text" name="' . $col . '" placeholder="' . $col . '" /><br>';
+        }
+
+        $str .= '<input type="submit" value="Save" />';
+
+        $str .= '</form>';
+        echo $str;
+        die;
     }
 
     if ($requestMethod === 'POST') {
         // Enregistrer les modifications
+        $tableName  = $modelsArray[$model] ?? false;
+        if (!$tableName) {
+            echo 'Invalid model';
+            die;
+        }
+        edit($db, $tableName, $_POST, $id);
+
+        header('Location: ' . BASE_PATH . $model . '/' . $id);
     }
 }
 
