@@ -87,4 +87,11 @@ function edit($connection, $table, $data, $id) {
     }
 }
 
+function deleteById($connection, $table, $id) {
+    $query = $connection->prepare('DELETE FROM ' . $table . ' WHERE id=:id;');
+    $query->bindParam(':id', $id);
+    $query->execute();
+    return;
+}
+
 

@@ -74,6 +74,9 @@ if (count($requestUriArray) === 1) {
         $str .= '<td>';
         $str .= '<a href="'. BASE_PATH . $model . '/' . $row['id'] .'/edit">Edit</a>';
         $str .= '</td>';
+        $str .= '<td>';
+        $str .= '<a href="'. BASE_PATH . $model . '/' . $row['id'] .'/delete">Delete</a>';
+        $str .= '</td>';
         $str .= '</tr>';
     }
 
@@ -187,10 +190,33 @@ if (count($requestUriArray) === 3) {
         die;
     }
 
-    // Vérifier que le 3e element est "edit"
-    if ($requestUriArray[2] !== 'edit') {
+    // Vérifier que le 3e element est "edit" ou "delete"
+    if ($requestUriArray[2] !== 'edit' && $requestUriArray[2] !== 'delete') {
         echo 'Invalid action';
         die;
+    }
+
+    if ($requestUriArray[2] === 'delete') {
+        // Comportement de suppression
+
+        // 1 - vérifier la validité du modèle
+        $tableName  = $modelsArray[$model] ?? false;
+        if (!$tableName) {
+            echo 'Invalid model';
+            die;
+        }
+        // 2 - vérifier qu'il y a une ligne avec l'id spécifié
+        $result = fetchById($db, $tableName, $id);
+
+        if (!$result) {
+            echo 'Invalid ID';
+            die;
+        }
+        // 3 - effectuer la suppression
+        deleteById($db, $tableName, $id);
+
+        // 4 - rediriger vers la vue liste
+        header('Location: ' . BASE_PATH . $model . '/');
     }
 
     echo 'Edit';
@@ -275,3 +301,4 @@ if (count($requestUriArray) === 3) {
 // videogames/1 => 2 => afficher les données de la ressource avec l'id numérique
 // videogames/add => 2 => afficher le formulaire d'ajout
 // videogames/1/edit => 3 => afficher le formulaire d'édition
+// videogames/1/delete => 3 => supprimer la ressource
